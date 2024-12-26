@@ -84,8 +84,8 @@ def recommend_high_avg_ratio(results, top_n):
 # Streamlit 앱
 def main():
     # st.title("코인 분석 및 추천")
-    st.markdown("<h2 style='font-size: 24px; text-align: center;'>코인 분석 및 추천 </h2>")
-    st.markdown("분석 주기는 **일별 종가**로 고정됩니다.")
+    st.markdown("<h2 style='font-size: 24px; text-align: center;'>코인 분석 및 추천</h2>", unsafe_allow_html=True)
+    st.markdown("분석 주기는 일별 종가로 고정됩니다.")
 
     # 사용자 입력
     lookback_days = st.number_input(
@@ -104,14 +104,14 @@ def main():
 
         # 추천 1
         # st.header("추천 1: 상승 여력 있는 코인")
-        st.markdown("<h2 style='font-size: 24px; text-align: center;'>추천 1: 상승 여력 있는 코인 </h2>")
+        st.markdown("<h2 style='font-size: 24px; text-align: center;'>추천 1: 상승 여력 있는 코인</h2>", unsafe_allow_html=True)
         low_rise_recommendation = recommend_low_rise_ratio(all_results, top_n)
         df_low_rise = pd.DataFrame(low_rise_recommendation)
         st.dataframe(df_low_rise)
 
         # 추천 2
         # st.header("추천 2: 최고가/평균가 비율이 높은 코인")
-        st.markdown("<h2 style='font-size: 24px; text-align: center;'>추천 2: 최근 급등한 코인 </h2>")
+        st.markdown("<h2 style='font-size: 24px; text-align: center;'>추천 2: 최근 급등한 코인</h2>", unsafe_allow_html=True)
         high_rise_recommendation = recommend_high_avg_ratio(all_results, top_n)
         df_high_rise = pd.DataFrame(high_rise_recommendation)
         st.dataframe(df_high_rise)
