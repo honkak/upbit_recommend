@@ -52,7 +52,7 @@ def analyze_ticker(ticker, time_frame, lookback_days):
             "최고가": highest_price,
             "평균 거래량": avg_volume,
             "일평균 거래금액": avg_daily_trade_amount,
-            "최고가/평균가 비율": ratio_high_avg,
+            "점핑율": ratio_high_avg,  # 열 이름 변경
         }
     except ZeroDivisionError:
         st.warning(f"{ticker}: 평균가가 0으로 인해 ZeroDivisionError 발생. 데이터 제외.")
@@ -71,7 +71,10 @@ def analyze_all_tickers(time_frame, lookback_days):
             results.append(analysis)
     return results
 
-# 포맷팅 함수: 수치가 1 이상이면 소수점 제거, 1 이하면 유지
+# 포맷팅 함수
+def format_average_price(value):
+    return f"{value:.2f}"  # 소수점 2자리까지 유지
+
 def format_number(value):
     if value > 1:
         return f"{int(value):,}"  # 정수로 변환 및 천단위 구분
@@ -79,12 +82,12 @@ def format_number(value):
 
 # 추천 1: 바닥 다지기 + 상승 여력이 있는 코인
 def recommend_low_rise_ratio(results, top_n):
-    sorted_results = sorted(results, key=lambda x: x["최고가/평균가 비율"])
+    sorted_results = sorted(results, key=lambda x: x["점핑율"])
     return sorted_results[:top_n]
 
-# 추천 2: 최고가/평균가 비율이 높은 코인
+# 추천 2: 점핑율이 높은 코인
 def recommend_high_avg_ratio(results, top_n):
-    sorted_results = sorted(results, key=lambda x: x["최고가/평균가 비율"], reverse=True)
+    sorted_results = sorted(results, key=lambda x: x["점핑율"], reverse=True)
     return sorted_results[:top_n]
 
 # Streamlit 앱
@@ -108,20 +111,22 @@ def main():
             return
 
         # 추천 1
-        st.markdown("<h2 style='font-size: 24px; text-align: left;'>추천 1: 상승 여력 있는 코인</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='font-size: 24px; text-align: left;'>추천 : 상승 여력 있는 코인</h2>", unsafe_allow_html=True)
         low_rise_recommendation = recommend_low_rise_ratio(all_results, top_n)
         df_low_rise = pd.DataFrame(low_rise_recommendation)
         # 포맷팅 적용
-        for col in ["평균가", "평균 거래량", "일평균 거래금액"]:
+        df_low_rise["평균가"] = df_low_rise["평균가"].apply(format_average_price)
+        for col in ["평균 거래량", "일평균 거래금액"]:
             df_low_rise[col] = df_low_rise[col].apply(format_number)
         st.dataframe(df_low_rise)
 
         # 추천 2
-        st.markdown("<h2 style='font-size: 24px; text-align: left;'>추천 2: 최근 급등한 코인</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='font-size: 24px; text-align: left;'>비추천 : 최근 급등한 코인</h2>", unsafe_allow_html=True)
         high_rise_recommendation = recommend_high_avg_ratio(all_results, top_n)
         df_high_rise = pd.DataFrame(high_rise_recommendation)
         # 포맷팅 적용
-        for col in ["평균가", "평균 거래량", "일평균 거래금액"]:
+        df_high_rise["평균가"] = df_high_rise["평균가"].apply(format_average_price)
+        for col in ["평균 거래량", "일평균 거래금액"]:
             df_high_rise[col] = df_high_rise[col].apply(format_number)
         st.dataframe(df_high_rise)
 
