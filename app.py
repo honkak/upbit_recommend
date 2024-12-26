@@ -47,12 +47,12 @@ def analyze_ticker(ticker, time_frame, lookback_days):
 
         return {
             "코인": ticker,
+            "점핑율": ratio_high_avg,
+            "일평균 거래금액": avg_daily_trade_amount,
             "최저가": lowest_price,
             "평균가": average_price,
             "최고가": highest_price,
             "평균 거래량": avg_volume,
-            "일평균 거래금액": avg_daily_trade_amount,
-            "점핑율": ratio_high_avg,  # 열 이름 변경
         }
     except ZeroDivisionError:
         st.warning(f"{ticker}: 평균가가 0으로 인해 ZeroDivisionError 발생. 데이터 제외.")
@@ -118,6 +118,9 @@ def main():
         df_low_rise["평균가"] = df_low_rise["평균가"].apply(format_average_price)
         for col in ["평균 거래량", "일평균 거래금액"]:
             df_low_rise[col] = df_low_rise[col].apply(format_number)
+        # 열 순서 변경
+        cols = ["코인", "점핑율", "일평균 거래금액", "최저가", "평균가", "최고가", "평균 거래량"]
+        df_low_rise = df_low_rise[cols]
         st.dataframe(df_low_rise)
 
         # 추천 2
@@ -128,6 +131,8 @@ def main():
         df_high_rise["평균가"] = df_high_rise["평균가"].apply(format_average_price)
         for col in ["평균 거래량", "일평균 거래금액"]:
             df_high_rise[col] = df_high_rise[col].apply(format_number)
+        # 열 순서 변경
+        df_high_rise = df_high_rise[cols]
         st.dataframe(df_high_rise)
 
         st.success("분석이 완료되었습니다!")
