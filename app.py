@@ -6,7 +6,7 @@ import streamlit as st
 import pyupbit
 import pandas as pd
 
-#서비스 제목 입력
+# 서비스 제목 입력
 st.markdown("<h2 style='font-size: 24px; text-align: center;'>다빈치 업비트 코인 추천기 </h2>", unsafe_allow_html=True)
 
 # 모든 코인 목록 가져오기
@@ -71,6 +71,12 @@ def analyze_all_tickers(time_frame, lookback_days):
             results.append(analysis)
     return results
 
+# 포맷팅 함수: 수치가 1 이상이면 소수점 제거, 1 이하면 유지
+def format_number(value):
+    if value > 1:
+        return f"{int(value):,}"  # 정수로 변환 및 천단위 구분
+    return f"{value:.4f}"  # 소수점 4자리 유지
+
 # 추천 1: 바닥 다지기 + 상승 여력이 있는 코인
 def recommend_low_rise_ratio(results, top_n):
     sorted_results = sorted(results, key=lambda x: x["최고가/평균가 비율"])
@@ -83,7 +89,6 @@ def recommend_high_avg_ratio(results, top_n):
 
 # Streamlit 앱
 def main():
-    # st.title("코인 분석 및 추천")
     st.markdown("<h2 style='font-size: 24px; text-align: left;'>코인 분석 및 추천</h2>", unsafe_allow_html=True)
     st.markdown("분석 주기는 일별 종가로 고정됩니다.")
 
@@ -103,21 +108,24 @@ def main():
             return
 
         # 추천 1
-        # st.header("추천 1: 상승 여력 있는 코인")
         st.markdown("<h2 style='font-size: 24px; text-align: left;'>추천 1: 상승 여력 있는 코인</h2>", unsafe_allow_html=True)
         low_rise_recommendation = recommend_low_rise_ratio(all_results, top_n)
         df_low_rise = pd.DataFrame(low_rise_recommendation)
+        # 포맷팅 적용
+        for col in ["평균가", "평균 거래량", "일평균 거래금액"]:
+            df_low_rise[col] = df_low_rise[col].apply(format_number)
         st.dataframe(df_low_rise)
 
         # 추천 2
-        # st.header("추천 2: 최고가/평균가 비율이 높은 코인")
         st.markdown("<h2 style='font-size: 24px; text-align: left;'>추천 2: 최근 급등한 코인</h2>", unsafe_allow_html=True)
         high_rise_recommendation = recommend_high_avg_ratio(all_results, top_n)
         df_high_rise = pd.DataFrame(high_rise_recommendation)
+        # 포맷팅 적용
+        for col in ["평균가", "평균 거래량", "일평균 거래금액"]:
+            df_high_rise[col] = df_high_rise[col].apply(format_number)
         st.dataframe(df_high_rise)
 
         st.success("분석이 완료되었습니다!")
 
 if __name__ == "__main__":
     main()
-
