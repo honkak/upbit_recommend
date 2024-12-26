@@ -2,14 +2,12 @@
 # 업비트 코인 추천 프로그램 개발_2024.12.27    #
 ##############################################
 
-#서비스 제목 입력
-st.markdown("<h2 style='font-size: 24px; text-align: center;'>다빈치 업비트 코인 추천기 </h2>", unsafe_allow_html=True)
-
-# File: streamlit_crypto_analysis.py
-
 import streamlit as st
 import pyupbit
 import pandas as pd
+
+#서비스 제목 입력
+st.markdown("<h2 style='font-size: 24px; text-align: center;'>다빈치 업비트 코인 추천기 </h2>", unsafe_allow_html=True)
 
 # 모든 코인 목록 가져오기
 def get_all_tickers():
